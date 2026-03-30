@@ -217,7 +217,5 @@ pip install openpyxl anthropic
 
 ## Author Contributions
 
-See [CONTRIBUTIONS.md](CONTRIBUTIONS.md) for a full session log, CRediT author contribution summary, and suggested manuscript Methods text.
-
 **Primary author:** Vishnu (University of Minnesota)
 **AI assistance:** Pipeline development and script implementation assisted by Claude (Anthropic, `claude-sonnet-4-6`) under author supervision.
