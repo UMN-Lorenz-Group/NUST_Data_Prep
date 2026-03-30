@@ -1,0 +1,10 @@
+Phenotype,Units
+YieldBuA,bu/a
+YieldRank,NA
+Maturity,date
+Lodging,score
+Height,inches
+SeedQuality,score
+SeedSize,g/100
+Protein,%
+Oil,%

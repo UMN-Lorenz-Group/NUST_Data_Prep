@@ -1,0 +1,29 @@
+
+#### Issue with encoding for some strain names (Look out for warning messages 
+#### (gsub/grep)
+
+ length(grep("Removedvalue",phenotypesTable1$Strain))
+ gsub("\u00A0", " ", "S20-13305�����������")
+
+
+ 
+#################### 
+# clean_string <- gsub("[^[:ascii:]]", " ", "S20-13305�����������")
+# Error in gsub("[^[:ascii:]]", " ", "S20-13305�����������") : 
+ #   invalid regular expression '[^[:ascii:]]', reason 'Unknown character class name'
+ # In addition: Warning message:
+ #   In gsub("[^[:ascii:]]", " ", "S20-13305�����������") :
+ #   TRE pattern compilation error 'Unknown character class name'
+ # > clean_string <- gsub("[\x80-\xFF]", " ", "S20-13305�����������")
+ # Error in gsub("[\x80-\xff]", " ", "S20-13305�����������") : 
+ #   'pattern' is invalid
+ # In addition: Warning message:
+ #   In gsub("[\x80-\xff]", " ", "S20-13305�����������") :
+ #   unable to translate '[<80>-<ff>]' to a wide string
+ # > library(stringi)
+ # > 
+ # > clean_string <- stri_replace_all_regex("S20-13305�����������", "[\\x80-\\xFF]", " ")
+ # > print(clean_string)
+ # [1] "S20-13305�����������"
+
+ 

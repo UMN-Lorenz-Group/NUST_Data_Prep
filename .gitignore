@@ -1,0 +1,23 @@
+# Word/Excel temporary lock files
+~$*
+
+# Extraction output directories (derived data, not source)
+output_*/
+
+# Annual processing data directories (raw trial data)
+2025_NUST_Processing/
+
+# R binary data files
+*.RData
+*.rds
+
+# Zip archives
+*.zip
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Error JSON files from extraction runs (transient)
+error_*.json
