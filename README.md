@@ -41,23 +41,53 @@ NUST_Data_Prep/
 ├── NUST_StrainsTable_Processing.R   # Annual: strains + parentage table
 ├── NUST_ChecksTable_Processing.R    # Annual: checks table
 ├── NUST_LocationsTable_Processing.R # Annual: locations table
-├── NUST_Processing.R                # Annual: phenotype processing (~971 lines)
-│
-├── extract_nust_xlsx.py             # Historical: XLSX extraction via Claude API
-├── validate_nust_hist.py            # Historical: post-extraction validation
+├── NUST_Processing.R                # Annual: phenotype processing
 ├── NUST_HistProcessing.R            # Historical: bridge — Python CSVs → R intermediates
-│
 ├── NUST_CheckFinalFiles.R           # SHARED Step 2: final QC + Files4Upload export
+├── DataChecksScript.R               # Manual QC checks
 │
-├── reference/
-│   └── phenotypesTable1_units_ref.csv  # Static Phenotype → Units lookup
+├── scripts/                         # Core Python pipeline scripts
+│   ├── extract_nust_xlsx.py         #   Historical XLSX extraction via Claude API
+│   ├── validate_nust_hist.py        #   Post-extraction validation
+│   ├── combine_nust_outputs.py      #   Merge multi-file extractions + TEST_MAP
+│   ├── extract_test_map_pdf.py      #   Group→TestCode mapping from source PDF
+│   ├── extract_supplemental_pdf.py  #   Supplemental location data from PDF
+│   ├── build_location_ref.py        #   Build/geocode nust_locations_ref.csv
+│   ├── compute_maturity_doy.py      #   Convert maturity dates to DOY
+│   ├── apply_maturity_doy.py        #   Apply DOY values to phenotypes table
+│   ├── pdf_pipeline.py              #   PDF extraction utilities
+│   └── qc_pdf_vs_csv.py             #   QC: compare PDF values against CSV output
 │
-├── 2025_StrainsTable_Processing.R   # Baseline scripts (2025-specific originals)
-├── 2025_ChecksTable_Processing.R
-├── 2025_LocationsTable_Processing.R
-├── NUST_2025_Processing_V2.R
-├── CheckFinalFiles.R
-└── DataChecksScript.R
+├── fixes/                           # Year-specific fix and patch scripts
+│   ├── fix_1980_locs.py             #   State norm, dedup, PlantingDate, lat/lon
+│   ├── fix_maturity_1980.py
+│   ├── fix_supplemental_1980.py
+│   ├── apply_patches_1980.py
+│   ├── compare_locations.py         #   Compare historical ref vs modern PlotInfo
+│   ├── patch_location_coords.py     #   Apply modern GPS to NeedsVerification rows
+│   └── clean_location_ref.py        #   One-time ref cleanup after initial geocoding
+│
+├── reference/                       # Reference tables (static + geocoded)
+│   ├── nust_locations_ref.csv       #   115 geocoded locations (1941–1986)
+│   ├── nust_locations_unique.csv    #   Unique City×State list from all years
+│   ├── 2024_NUST_Locations_PlotInfo.csv
+│   ├── 2025_NUST_Locations_PlotInfo.csv
+│   └── phenotypesTable1_units_ref.csv  # Phenotype → Units lookup
+│
+├── docs/                            # Supporting documentation
+│   ├── NUST_Phase2_Pipeline_Workflow.docx
+│   ├── system_prompt_multiyr_notes.md
+│   └── NUST_Processing_ReadMe.txt
+│
+├── logs/                            # Session notes, reports, open items
+│   ├── NUST_Pipeline_Session_*.md
+│   ├── NUST_1980_Open_Items.md
+│   └── NUST_Location_Comparison_*.md
+│
+├── diagnostics/                     # Archived debug and inspection scripts
+│
+├── input_1980/                      # Source XLSX + PDF for 1980
+└── output_1980/                     # Extracted CSVs for 1980
 ```
 
 ---
@@ -97,6 +127,7 @@ STEP 1H — Python extraction:            STEP 1A — R extraction:
                 parentageTable1.csv
                 LocationsTable1.csv
                 checksTable1.csv
+                metaTable1.csv
 ```
 
 ---
@@ -123,7 +154,7 @@ STEP 1H — Python extraction:            STEP 1A — R extraction:
 #### Step 1 — Extract from XLSX
 
 ```bash
-python extract_nust_xlsx.py \
+python scripts/extract_nust_xlsx.py \
   --file "Sojabone-YYYY (1-89 OR).xlsx" \
   --out_dir ./output_YYYY/ \
   --api_key "sk-ant-..."
@@ -134,14 +165,18 @@ Requires an [Anthropic API key](https://console.anthropic.com). The script uses 
 #### Step 2 — Validate extraction output
 
 ```bash
-python validate_nust_hist.py \
+python scripts/validate_nust_hist.py \
   --input ./output_YYYY/..._phenotypes.csv \
   --out_dir ./output_YYYY/validated/
 ```
 
 Outputs `*_approved.csv` and `*_review_flagged.csv`. Review flagged rows before proceeding.
 
-#### Step 3 — Run R bridge + formatting
+#### Step 3 — QC and fix (year-specific)
+
+Run `scripts/qc_pdf_vs_csv.py` against the source PDF to identify cell-level discrepancies across all Test×Location combos. Apply year-specific fix scripts in `fixes/` to patch confirmed issues in the source tables, then re-validate. See `docs/NUST_Historical_Extraction_Workflow.md` for the full 3-phase QC workflow.
+
+#### Step 4 — Run R bridge + formatting
 
 Edit `run_nust_historical_pipeline.R` — set `YEAR`, `HIST_CSV_DIR`, and `DATA_DIR`:
 ```r
@@ -157,7 +192,14 @@ source("run_nust_historical_pipeline.R")
 
 Output written to `DATA_DIR/Files4Upload/`
 
-#### Step 4 — Map test labels (optional)
+#### Step 5 — Verify cross-table consistency
+
+```bash
+python fixes/consistency_check_{year}.py   # strains, locations, checks, metaTable
+python fixes/verify_phase3_{year}.py       # confirm PDF-patched cells in Files4Upload
+```
+
+#### Step 6 — Map test labels (optional)
 
 The extraction uses `Group_1`…`Group_6` as test identifiers. To remap to standard NUST codes (`UT00`, `UTI`, etc.), uncomment and fill in the `TEST_MAP` block at the bottom of `NUST_HistProcessing.R`:
 
@@ -180,6 +222,7 @@ TEST_MAP <- c(
 | `parentageTable1.csv` | Parentage: Female × Male cross |
 | `LocationsTable1.csv` | Location metadata: City, State, lat, lon, Conductor |
 | `checksTable1.csv` | Check entries and relative maturity |
+| `metaTable1.csv` | Per-location statistical metadata: CV%, LSD, row spacing, reps |
 
 ---
 
@@ -203,7 +246,7 @@ pip install openpyxl anthropic
 
 - R 4.4.2 (Windows)
 - Python 3.10 (Windows)
-- Tested on: annual 2024–2025 data; historical 1980 XLSX (`Sojabone-1980 (1-89 OR).xlsx`)
+- Tested on: annual 2024–2025 data; historical 1980 XLSX (fully QC'd against source PDF; all cross-table checks pass)
 
 ---
 
@@ -211,7 +254,7 @@ pip install openpyxl anthropic
 
 - The `ANTHROPIC_API_KEY` should be passed via `--api_key` argument or set as an environment variable. **Never commit API keys to this repository.**
 - Historical fatty acid / seed sugar traits (`PalmiticAcid`, `Oil`, etc.) are present as `NA` in pre-2023 output — these traits were not measured in early trials.
-- `LocationsTable1.csv` for historical years contains `NA` for `lat`, `lon`, `Conductor`, and planting/maturity dates — not available in source documents.
+- `LocationsTable1.csv` for historical years contains `NA` for `Conductor` and planting/maturity dates — not available in source documents. Coordinates (`lat`, `lon`) are populated from `reference/nust_locations_ref.csv` (115 geocoded locations, 1941–1986; 22 flagged `NeedsVerification`).
 
 ---
 
