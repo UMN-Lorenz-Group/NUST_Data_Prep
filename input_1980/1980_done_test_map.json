@@ -1,0 +1,77 @@
+{
+  "year": "1980",
+  "total_groups": 8,
+  "groups": [
+    {
+      "group_number": 1,
+      "test_code": "UT-00",
+      "test_name": "Uniform Test 00",
+      "maturity_group": "00",
+      "notes": "Labeled as 'UNIFORM TEST 00, 1980' in the document"
+    },
+    {
+      "group_number": 2,
+      "test_code": "UT-0",
+      "test_name": "Uniform Test 0",
+      "maturity_group": "0",
+      "notes": "Labeled as 'UNIFORM TEST 0, 1980' in the document"
+    },
+    {
+      "group_number": 3,
+      "test_code": "UT-I",
+      "test_name": "Uniform Test I",
+      "maturity_group": "I",
+      "notes": "Labeled as 'UNIFORM TEST I, 1980' in the document"
+    },
+    {
+      "group_number": 4,
+      "test_code": "PT-I",
+      "test_name": "Preliminary Test I",
+      "maturity_group": "I",
+      "notes": "Labeled as 'PRELIMINARY TEST I, 1980' in the document"
+    },
+    {
+      "group_number": 5,
+      "test_code": "UT-II",
+      "test_name": "Uniform Test II",
+      "maturity_group": "II",
+      "notes": "Labeled as 'UNIFORM TEST II, 1980' in the document"
+    },
+    {
+      "group_number": 6,
+      "test_code": "PT-II",
+      "test_name": "Preliminary Test II",
+      "maturity_group": "II",
+      "notes": "Labeled as 'PRELIMINARY TEST II, 1980' in the document"
+    },
+    {
+      "group_number": 7,
+      "test_code": "UT-III",
+      "test_name": "Uniform Test III",
+      "maturity_group": "III",
+      "notes": "Labeled as 'UNIFORM TEST III, 1980' in the document"
+    },
+    {
+      "group_number": 8,
+      "test_code": "PT-III",
+      "test_name": "Preliminary Test III",
+      "maturity_group": "III",
+      "notes": "Labeled as 'PRELIMINARY TEST III, 1980' in the document"
+    },
+    {
+      "group_number": 9,
+      "test_code": "UT-IV",
+      "test_name": "Uniform Test IV",
+      "maturity_group": "IV",
+      "notes": "Labeled as 'UNIFORM TEST IV, 1980' in the document"
+    },
+    {
+      "group_number": 10,
+      "test_code": "PT-IV",
+      "test_name": "Preliminary Test IV",
+      "maturity_group": "IV",
+      "notes": "Labeled as 'PRELIMINARY TEST IV, 1980' in the document"
+    }
+  ],
+  "document_notes": "The document contains 10 entry groups total (not 8 as initially counted): Uniform Tests for MG 00, 0, I, II, III, and IV, plus Preliminary Tests for MG I, II, III, and IV. The document begins with an 'Identification of Parent Strains' section listing parentage for strains used across all tests. Test naming follows the pattern 'UNIFORM TEST [MG], 1980' or 'PRELIMINARY TEST [MG], 1980'. The total_groups field has been set to 10 to reflect the actual count."
+}

@@ -14,7 +14,7 @@
 #   STEP 2 — Shared formatting  (IDENTICAL entry point for historical path)
 #     NUST_CheckFinalFiles.R               -> Files4Upload/
 
-SCRIPTS_DIR <- "C:/Users/ivanv/Desktop/UMN_GIT/NUST_Data_Prep/"
+SCRIPTS_DIR <- "C:/Users/ivanv/Desktop/UMN_GIT/NUST_Data_Prep/Rscripts/"
 
 # -------------------------------------------------------------------------
 # USER: set year and data directory for the run

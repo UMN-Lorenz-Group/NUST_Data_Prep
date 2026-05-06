@@ -25,8 +25,9 @@
 #                               parentageTable1.csv
 #                               checksTable1.csv
 #                               LocationsTable1.csv
+#                               metaTable1.csv        (if combined MetaTable present)
 
-SCRIPTS_DIR <- "C:/Users/ivanv/Desktop/UMN_GIT/NUST_Data_Prep/"
+SCRIPTS_DIR <- "C:/Users/ivanv/Desktop/UMN_GIT/NUST_Data_Prep/Rscripts/"
 
 # ─── USER: configure per run ─────────────────────────────────────────────────
 YEAR <- "1980"

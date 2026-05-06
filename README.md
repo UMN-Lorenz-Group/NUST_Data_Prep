@@ -75,16 +75,16 @@ NUST_Data_Prep/
 ├── run_nust_pipeline.R              # Entry point — annual data (2024+)
 ├── run_nust_historical_pipeline.R   # Entry point — historical data (pre-2023)
 │
-├── nust_utils.R                     # Shared utility functions
-├── nust_config.R                    # Year-aware config and test auto-detection
-│
-├── NUST_StrainsTable_Processing.R   # Annual: strains + parentage table
-├── NUST_ChecksTable_Processing.R    # Annual: checks table
-├── NUST_LocationsTable_Processing.R # Annual: locations table
-├── NUST_Processing.R                # Annual: phenotype processing
-├── NUST_HistProcessing.R            # Historical: bridge — Python CSVs → R intermediates
-├── NUST_CheckFinalFiles.R           # SHARED Step 2: final QC + Files4Upload export
-├── DataChecksScript.R               # Manual QC checks
+├── Rscripts/                        # R processing modules
+│   ├── nust_utils.R                 #   Shared utility functions
+│   ├── nust_config.R                #   Year-aware config and test auto-detection
+│   ├── NUST_StrainsTable_Processing.R   #   Annual: strains + parentage table
+│   ├── NUST_ChecksTable_Processing.R    #   Annual: checks table
+│   ├── NUST_LocationsTable_Processing.R #   Annual: locations table
+│   ├── NUST_Processing.R                #   Annual: phenotype processing
+│   ├── NUST_HistProcessing.R            #   Historical: bridge — Python CSVs → R intermediates
+│   ├── NUST_CheckFinalFiles.R           #   SHARED Step 2: final QC + Files4Upload export
+│   └── DataChecksScript.R               #   Manual QC checks
 │
 ├── scripts/                         # Core Python pipeline scripts
 │   ├── extract_nust_xlsx.py         #   Historical XLSX extraction via Claude API

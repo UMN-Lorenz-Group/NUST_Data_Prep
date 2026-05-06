@@ -1,0 +1,154 @@
+=== Building NUST master location reference ===
+
+Step 1: Collecting from extracted CSVs...
+  From extracted CSVs: 159 location rows
+Step 2: Scanning XLSX files for location headers...
+  From XLSX scans: 158 location strings parsed
+
+Total unique City+State pairs: 133
+  Saved to nust_locations_unique.csv
+
+Step 3: Geocoding 133 locations via Nominatim (~133 seconds)...
+  Portageville Mo, CLAY, USA -> 36.425366,-89.700638
+  Georgetown, DE, USA -> 38.690051,-75.385875
+  Newark, DE, USA -> 39.682836,-75.751568
+  Georgetown, DEL, USA -> 38.690051,-75.385875
+  [STATION] Ames, IA, USA -> 42.026757,-93.617045
+  Corwith, IA, USA -> 42.992919,-93.957364
+  Cresco, IA, USA -> 43.373615,-92.116144
+  Hudson, IA, USA -> 42.406586,-92.455301
+  Kanawha, IA, USA -> 42.935403,-93.793368
+  Knierim, IA, USA -> 42.455544,-94.457158
+  Marshalltown, IA, USA -> 42.048881,-92.912267
+  Ottumwa, IA, USA -> 41.019566,-92.411689
+  Stuart, IA, USA -> 41.503321,-94.318574
+  Sutherland, IA, USA -> 42.974285,-95.497564
+  [STATION] Belleville, IL, USA -> 38.513581,-89.984163
+  Brownstown, IL, USA -> 38.995878,-88.952839
+  Carbondale, IL, USA -> 37.727469,-89.216655
+  Clayton, IL, USA -> 40.031437,-90.96069
+  [STATION] Dekalb, IL, USA -> 41.890345,-88.771395
+  Dwight, IL, USA -> 41.094477,-88.42506
+  Eldorado, IL, USA -> 37.813658,-88.438103
+  Giradr, IL, USA -> None,None
+  Girard, IL, USA -> 39.445883,-89.77825
+  Greenfield, IL, USA -> 39.343658,-90.212615
+  Mt. Morris, IL, USA -> 42.050306,-89.43122
+  Pontiac, IL, USA -> 40.880867,-88.629784
+  Stonington, IL, USA -> 39.640043,-89.192861
+  Sullivan, IL, USA -> 39.599479,-88.607839
+  [STATION] Urbana, IL, USA -> 40.111717,-88.207301
+  Belleville, ILL, USA -> 38.513581,-89.984163
+  Brownstown, ILL, USA -> 38.995878,-88.952839
+  Carbondale, ILL, USA -> 37.727469,-89.216655
+  Eldorado, ILL, USA -> 37.813658,-88.438103
+  Bluffton, IN, USA -> 40.738658,-85.171637
+  Evansville, IN, USA -> 37.970495,-87.571564
+  Greenfield, IN, USA -> 39.78551,-85.768198
+  [STATION] Lafayette, IN, USA -> 40.419123,-86.891901
+  Sullivan, IN, USA -> 39.049272,-87.417264
+  Vincennes, IN, USA -> 38.677269,-87.528633
+  Walkerton, IN, USA -> 41.466711,-86.483068
+  Worthington, IN, USA -> 39.118558,-86.976599
+  Lafayette, IND, USA -> 40.419123,-86.891901
+  Sullivan, IND, USA -> 39.049272,-87.417264
+  [STATION] Manhattan, KAN, USA -> 39.183608,-96.571669
+  Ottawa, KAN, USA -> 39.127365,-97.656809
+  Powhattan, KAN, USA -> 39.761462,-95.633583
+  Ashland, KS, USA -> 37.188638,-99.765683
+  [STATION] Manhattan, KS, USA -> 39.183608,-96.571669
+  Mound Valley, KS, USA -> 37.205346,-95.404975
+  Ottawa, KS, USA -> 39.127365,-97.656809
+  Powhattan, KS, USA -> 39.761462,-95.633583
+  Thayer, KS, USA -> 37.4886,-95.472639
+  Lexington, KY, USA -> 38.046407,-84.497039
+  Portageville Mo, LOAM, USA -> 36.425366,-89.700638
+  [STATION] Brandon, MAN, Canada -> 49.851114,-99.960892
+  [STATION] Morden, MAN, Canada -> 49.192706,-98.101457
+  Portage La Prairie, MAN, Canada -> 49.972422,-98.289185
+  [STATION] Winnipeg, MAN, Canada -> 49.895537,-97.138458
+  [STATION] Beltsville, MD, USA -> 39.039774,-76.927185
+  Clarksville, MD, USA -> 39.206545,-76.942918
+  [STATION] Queenstown, MD, USA -> 38.990668,-76.157727
+  Dearborn, MI, USA -> 42.32226,-83.176315
+  Deerfield, MI, USA -> 41.888936,-83.778828
+  Dundee, MI, USA -> 41.957268,-83.65966
+  [STATION] East Lansing, MI, USA -> 42.732031,-84.472168
+  Ida, MI, USA -> 41.910902,-83.573458
+  Ithaca, MI, USA -> 43.291698,-84.6075
+  Ottawa Lake, MI, USA -> 41.764152,-83.749387
+  [STATION] Crookston, MN, USA -> 47.773999,-96.608117
+  [STATION] Lamberton, MN, USA -> 44.231068,-95.264164
+  [STATION] Morris, MN, USA -> 45.586072,-95.913941
+  [STATION] Rosemount, MN, USA -> 44.739187,-93.12611
+  St. Paul, MN, USA -> 44.949749,-93.093103
+  [STATION] Waseca, MN, USA -> 44.017224,-93.588572
+  Waseca,, MN, USA -> 44.017224,-93.588572
+  Clinton, MO, USA -> 39.597599,-94.41849
+  [STATION] Columbia, MO, USA -> 38.951883,-92.333737
+  Laddonia, MO, USA -> 39.24254,-91.645438
+  Norborne, MO, USA -> 39.302517,-93.677438
+  Novelty, MO, USA -> 40.012539,-92.208238
+  [STATION] Portageville, MO, USA -> 36.425366,-89.700638
+  Portageville Clay, MO, USA -> None,None
+  [STATION] Portageville Loam, MO, USA -> None,None
+  [STATION] Fargo, ND, USA -> 46.877229,-96.789821
+  Oakes, ND, USA -> 46.138579,-98.090379
+  Lincoln, NE, USA -> 40.808886,-96.707775
+  Mead, NE, USA -> 41.226621,-96.489259
+  Lincoln, NEB, USA -> 40.808886,-96.707775
+  Adelphia, NJ, USA -> 40.218168,-74.256257
+  Burlington, NJ, USA -> 39.932541,-74.722667
+  Burlington Co., NJ, USA -> 39.932541,-74.722667
+  Englishtown, NJ, USA -> 40.297332,-74.358204
+  Middlesex Co., NJ, USA -> 40.427971,-74.39631
+  New Brunswick, NJ, USA -> 40.495137,-74.443925
+  Columbus, OH, USA -> 39.96226,-83.000707
+  Cortland, OH, USA -> 41.330137,-80.725243
+  Harrow, OH, USA -> 39.157664,-84.419104
+  Holgate, OH, USA -> 41.248937,-84.133
+  Hoytville, OH, USA -> 41.190052,-83.784659
+  Mt. Healthy, OH, USA -> 39.233669,-84.545778
+  S. Charleston, OH, USA -> 39.825338,-83.634367
+  [STATION] Wooster, OH, USA -> 40.798098,-81.939773
+  [STATION] Elora, ONT, Canada -> 43.681148,-80.429581
+  [STATION] Guelph, ONT, Canada -> 43.546052,-80.249328
+  [STATION] Harrow, ONT, Canada -> 42.035586,-82.918359
+  London,, ONT, Canada -> 42.983675,-81.249607
+  [STATION] Ottawa, ONT, Canada -> 45.420878,-75.690111
+  [STATION] Ridgetown, ONT, Canada -> 42.439235,-81.887051
+  Ontario, OR, USA -> 44.026553,-116.962938
+  Lancaster, PA, USA -> 40.037996,-76.305671
+  Landisville, PA, USA -> 40.09512,-76.410196
+  Palmyra, PA, USA -> 40.308858,-76.593237
+  [STATION] State College, PA, USA -> 40.79445,-77.861639
+  Landisville, PENN, USA -> 40.09512,-76.410196
+  [STATION] Brookings, SD, USA -> 44.311461,-96.79844
+  Brookings,, SD, USA -> 44.311461,-96.79844
+  Elk Point, SD, USA -> 42.686532,-96.682922
+  Elkpoint, SD, USA -> 38.456249,-121.398216
+  Point Elk, SD, USA -> 42.686532,-96.682922
+  Rosholt, SD, USA -> 45.866626,-96.731463
+  Sisseton, SD, USA -> 45.664557,-97.049791
+  Watertown, SD, USA -> 44.899211,-97.115289
+  [STATION] Lubbock, TX, USA -> 33.585568,-101.847021
+  Blacksburg, VA, USA -> 37.229657,-80.413677
+  Moses Lake, WA, USA -> 47.130142,-119.278077
+  [STATION] Arlington, WI, USA -> 43.337713,-89.377932
+  Arlington,, WI, USA -> 43.337713,-89.377932
+  [STATION] Ashland, WI, USA -> 46.206232,-90.680259
+  Durand, WI, USA -> 44.62837,-91.967663
+  Eau Claire, WI, USA -> 44.811349,-91.498494
+  Fall City, WI, USA -> 44.809017,-89.683735
+  [STATION] Madison, WI, USA -> 43.07469,-89.384166
+  Spooner, WI, USA -> 45.826773,-91.888238
+
+=== Summary ===
+  Total locations : 133
+  Geocoded        : 130
+  Research stations flagged for verification: 34
+  Failed (lat=NULL): 3
+
+Saved -> nust_locations_ref.csv
+
+Next step: manually verify/correct coordinates for NeedsVerification=1 rows.
