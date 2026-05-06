@@ -30,7 +30,7 @@ All final output tables follow a standardized schema:
 ## Pipeline Architecture
 
 ```
-HISTORICAL PATH (pre-2020)              ANNUAL PATH (2024+)
+HISTORICAL PATH (pre-1989)              ANNUAL PATH (2020+)
 ────────────────────────────────        ────────────────────────────────
 STEP 1H — Python extraction:            STEP 1A — R extraction:
   extract_nust_xlsx.py                    NUST_StrainsTable_Processing.R
@@ -72,8 +72,8 @@ STEP 1H — Python extraction:            STEP 1A — R extraction:
 ```
 NUST_Data_Prep/
 │
-├── run_nust_pipeline.R              # Entry point — annual data (2024+)
-├── run_nust_historical_pipeline.R   # Entry point — historical data (pre-2023)
+├── run_nust_pipeline.R              # Entry point — annual data (2020+)
+├── run_nust_historical_pipeline.R   # Entry point — historical data (pre-1989)
 │
 ├── Rscripts/                        # R processing modules
 │   ├── nust_utils.R                 #   Shared utility functions
@@ -134,7 +134,7 @@ NUST_Data_Prep/
 
 ## Usage
 
-### Annual Data (2024+)
+### Annual Data (2020+)
 
 1. Edit `run_nust_pipeline.R` — set `YEAR` and `DATA_DIR`:
    ```r
@@ -149,7 +149,7 @@ NUST_Data_Prep/
 
 ---
 
-### Historical Data (pre-2020 XLSX)
+### Historical Data (pre-1989 XLSX)
 
 #### Step 1 — Extract from XLSX
 
@@ -260,5 +260,6 @@ pip install openpyxl anthropic
 
 ## Author Contributions
 
-**Primary author:** Vishnu (University of Minnesota)
+**Primary author:** Vishnu (University of Minnesota) 
+**PI:** Aaron Lorenz (University of Minnesota) & Rex Nelson (USDA)     
 **AI assistance:** Pipeline development and script implementation assisted by Claude (Anthropic, `claude-sonnet-4-6`) under author supervision.
