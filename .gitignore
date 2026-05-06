@@ -9,6 +9,10 @@
 # Word/Excel temporary lock files
 ~$*
 
+# Internal working documents (not for distribution)
+Formatting_Note_From_Rex.docx
+NUST_Phase2_Pipeline_Workflow.docx
+
 # Extraction output directories (derived data, not source)
 output_*/
 
