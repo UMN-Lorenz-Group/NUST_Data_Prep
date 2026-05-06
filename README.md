@@ -12,19 +12,6 @@ This repository contains a two-stage data preparation pipeline for processing No
 - **Stage 1** handles source-specific extraction — different for historical (pre-2020 XLSX) and annual (2021+ CSV) data
 - **Stage 2** is a shared R formatting pipeline applied identically to both sources
 
-All final output tables follow a standardized schema:
-
-| Column | Description |
-|---|---|
-| `Strain` | Cleaned strain identifier |
-| `Year` | Trial year |
-| `Test` | Trial test group (e.g., UTI, UTII, PTII) |
-| `City` | Trial location city |
-| `State` | Trial location state/province |
-| `Phenotype` | Trait name (e.g., YieldBuA, Lodging) |
-| `Value` | Observed value |
-| `Units` | Units of measurement |
-
 ---
 
 ## Pipeline Architecture
