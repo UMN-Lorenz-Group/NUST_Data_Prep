@@ -19,24 +19,25 @@ This repository contains a two-stage data preparation pipeline for processing No
 ```
 HISTORICAL PATH (pre-1989)              ANNUAL PATH (2020+)
 ────────────────────────────────        ────────────────────────────────
-STEP 1H — Python extraction:            STEP 1A — R extraction:
+STEP 1H — Python + Claude API:          STEP 1A — R extraction:
   extract_nust_xlsx.py                    NUST_StrainsTable_Processing.R
-    → *_phenotypes.csv (long)             NUST_ChecksTable_Processing.R
-    → *_strains.csv                       NUST_LocationsTable_Processing.R
-    → *_parentage.csv                     NUST_Processing.R
-    → *_descriptive.csv
-    → *_disease.csv
-    → *_summary.csv
+    → long-format CSVs                    NUST_ChecksTable_Processing.R
+      (phenotypes, strains,               NUST_LocationsTable_Processing.R
+       parentage, descriptive,            NUST_Processing.R
+       disease, summary)
           │
   validate_nust_hist.py
     → *_approved.csv
           │
+  qc_pdf_vs_csv.py (Claude API)
+    cell-by-cell validation
+    against source PDF
+    → patches applied via
+      year-specific fixes/
+          │
   NUST_HistProcessing.R (bridge)
-    → phenotypesTable0.csv (wide)
-    → strainsTable1.csv
-    → parentageTable1.csv
-    → LocationsTable1.csv
-    → checksTable1.csv (0-row)
+    → R intermediates
+      (wide format, ready for Step 2)
           │                                       │
           └─────────────────┬─────────────────────┘
                             ▼
