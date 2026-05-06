@@ -27,6 +27,46 @@ All final output tables follow a standardized schema:
 
 ---
 
+## Pipeline Architecture
+
+```
+HISTORICAL PATH (pre-2020)              ANNUAL PATH (2024+)
+────────────────────────────────        ────────────────────────────────
+STEP 1H — Python extraction:            STEP 1A — R extraction:
+  extract_nust_xlsx.py                    NUST_StrainsTable_Processing.R
+    → *_phenotypes.csv (long)             NUST_ChecksTable_Processing.R
+    → *_strains.csv                       NUST_LocationsTable_Processing.R
+    → *_parentage.csv                     NUST_Processing.R
+    → *_descriptive.csv
+    → *_disease.csv
+    → *_summary.csv
+          │
+  validate_nust_hist.py
+    → *_approved.csv
+          │
+  NUST_HistProcessing.R (bridge)
+    → phenotypesTable0.csv (wide)
+    → strainsTable1.csv
+    → parentageTable1.csv
+    → LocationsTable1.csv
+    → checksTable1.csv (0-row)
+          │                                       │
+          └─────────────────┬─────────────────────┘
+                            ▼
+          STEP 2 — SHARED (identical for both paths)
+            NUST_CheckFinalFiles.R
+                            │
+                      Files4Upload/
+                phenotypesTable1.csv
+                strainsTable1.csv
+                parentageTable1.csv
+                LocationsTable1.csv
+                checksTable1.csv
+                metaTable1.csv
+```
+
+---
+
 ## Repository Structure
 
 ```
@@ -88,46 +128,6 @@ NUST_Data_Prep/
 │
 ├── input_1980/                      # Source XLSX + PDF for 1980
 └── output_1980/                     # Extracted CSVs for 1980
-```
-
----
-
-## Pipeline Architecture
-
-```
-HISTORICAL PATH (pre-2020)              ANNUAL PATH (2024+)
-────────────────────────────────        ────────────────────────────────
-STEP 1H — Python extraction:            STEP 1A — R extraction:
-  extract_nust_xlsx.py                    NUST_StrainsTable_Processing.R
-    → *_phenotypes.csv (long)             NUST_ChecksTable_Processing.R
-    → *_strains.csv                       NUST_LocationsTable_Processing.R
-    → *_parentage.csv                     NUST_Processing.R
-    → *_descriptive.csv
-    → *_disease.csv
-    → *_summary.csv
-          │
-  validate_nust_hist.py
-    → *_approved.csv
-          │
-  NUST_HistProcessing.R (bridge)
-    → phenotypesTable0.csv (wide)
-    → strainsTable1.csv
-    → parentageTable1.csv
-    → LocationsTable1.csv
-    → checksTable1.csv (0-row)
-          │                                       │
-          └─────────────────┬─────────────────────┘
-                            ▼
-          STEP 2 — SHARED (identical for both paths)
-            NUST_CheckFinalFiles.R
-                            │
-                      Files4Upload/
-                phenotypesTable1.csv
-                strainsTable1.csv
-                parentageTable1.csv
-                LocationsTable1.csv
-                checksTable1.csv
-                metaTable1.csv
 ```
 
 ---
