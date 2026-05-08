@@ -9,8 +9,9 @@ University of Minnesota — Lorenz Lab
 
 This repository contains a two-stage data preparation pipeline for processing North American Uniform Soybean Trial (NUST) data from multiple sources into a standardized long-format output suitable for genomic analysis and database upload.
 
-- **Stage 1** handles source-specific extraction — different for historical (pre-2020 XLSX) and annual (2021+ CSV) data
-- **Stage 2** is a shared R formatting pipeline applied identically to both sources
+- **Stage 0** A group in South Africa extracted data tables from historical (pre-1989 PDFs) and generated XLSX files, which were QC'd by participants in historical document recovery project
+- **Stage 1** handles source-specific extraction — different for historical (pre-1989 XLSX) generated from Stage 0 and annual (2020+ CSV) data
+- **Stage 2** is a shared R formatting pipeline applied identically to both sources to generate files suitable for upload to Soybase
 
 ---
 
