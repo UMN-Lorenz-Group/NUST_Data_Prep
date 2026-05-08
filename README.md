@@ -249,6 +249,7 @@ pip install openpyxl anthropic
 
 ## Author Contributions
 
-**Primary author:** Vishnu (University of Minnesota) 
+**Primary author:** Vishnu Ramasubramanian(University of Minnesota) 
 **PI:** Aaron Lorenz (University of Minnesota) & Rex Nelson (USDA)     
+**Contributors:** Lovepreet Singh (University of Minnesota) & Jacqueline Campbell (USDA)
 **AI assistance:** Pipeline development and script implementation assisted by Claude (Anthropic, `claude-sonnet-4-6`) under author supervision.
