@@ -7,38 +7,113 @@ University of Minnesota — Lorenz Lab
 
 ## Overview
 
-This repository contains a two-stage data preparation pipeline for processing North American Uniform Soybean Trial (NUST) data from multiple sources into a standardized long-format output suitable for genomic analysis and database upload.
+This repository contains a staged data-preparation pipeline for processing North American Uniform Soybean Trial (NUST) data from multiple sources into a standardized long-format corpus (1941–2025) suitable for genomic analysis and database upload, plus a downstream realized-genetic-gain (RGG) analysis suite.
 
-- **Stage 0** A group in South Africa extracted data tables from historical (pre-1989 PDFs) and generated XLSX files, which were QC'd by participants in historical document recovery project
-- **Stage 1** handles source-specific extraction — different for historical (pre-1989 XLSX) generated from Stage 0 and annual (2020+ CSV) data
-- **Stage 2** is a shared R formatting pipeline applied identically to both sources to generate files suitable for upload to Soybase
+The reusable pipeline scripts live in `data_prep/`, organized by stage:
+
+- **Stage 0 (`stage0_extraction/`)** — source preprocessing + raw PDF/XLSX extraction
+- **Stage 1 (`stage1_processing/`)** — per-year R-bridge + QC + maturity-DOY + location reference (source-specific extraction → shared R formatting → Files4Upload)
+- **Stage 2 (`stage2_corpus/`)** — cross-year corpus assembly, check curation, `IsCheck` rebuild, wide-format build, and the era-split
+
+RGG modeling and diagnostics live in `analysis/`; superseded scripts, one-off per-year fix/run instances, backups, and historical logs are kept under `archive/` (history preserved).
+
+All final output tables follow a standardized schema:
+
+| Column | Description |
+|---|---|
+| `Strain` | Cleaned strain identifier |
+| `Year` | Trial year |
+| `Test` | Trial test group (e.g., UTI, UTII, PTII) |
+| `City` | Trial location city |
+| `State` | Trial location state/province |
+| `Phenotype` | Trait name (e.g., YieldBuA, Lodging) |
+| `Value` | Observed value |
+| `Units` | Units of measurement |
+
+---
+
+## Repository Structure
+
+```
+NUST_Data_Prep/
+│
+├── data_prep/                          # Staged extraction & data-preparation pipeline
+│   ├── stage0_extraction/              #   source preprocess + raw PDF/XLSX extraction
+│   │   ├── extract_nust_xlsx.py        #     Historical XLSX extraction via Claude API
+│   │   ├── extract_nust_pdf.py         #     PDF-direct extraction (years w/o XLSX)
+│   │   ├── extract_nust_blocks.py      #     Per-block XLSX extraction (1987/1988)
+│   │   ├── extract_test_map_pdf.py     #     Group→TestCode mapping from source PDF
+│   │   ├── pdf_pipeline.py             #     Unified cached-PDF query orchestrator
+│   │   ├── preprocess_pdf_compress.py  #     Shrink PDFs below API size limit
+│   │   └── extract_*_anchors.py        #     Maturity reference-strain anchors
+│   │
+│   ├── stage1_processing/              #   per-year R-bridge + QC + maturity DOY + locations
+│   │   ├── run_nust_pipeline.R         #     Entry point — annual data (2024+)
+│   │   ├── run_nust_historical_pipeline.R #  Entry point — historical (pre-2023)
+│   │   ├── nust_utils.R / nust_config.R   #  Shared utilities + year-aware config
+│   │   ├── NUST_*Processing*.R / NUST_CheckFinalFiles.R  # R bridge + shared formatting
+│   │   ├── validate_nust_hist.py / qc_pdf_vs_csv.py      # post-extraction QC
+│   │   ├── combine_nust_outputs.py    #     Merge multi-file extractions + TEST_MAP
+│   │   ├── compute_maturity_doy.py / apply_maturity_doy.py  # maturity DOY conversion
+│   │   └── build_location_ref.py + location/maturity utilities
+│   │
+│   └── stage2_corpus/                  #   cross-year corpus, checks, IsCheck, wide, split
+│       ├── 10_assemble_corpus.py       #     Build the 1941–2025 long corpus
+│       ├── 11_build_wide_1941_2025.py  #     Pivot long → wide (22-col modeling schema)
+│       ├── 35_apply_protein_oil_moisture_fix.py
+│       ├── 65_build_check_lookup.py / 67_build_checks_from_pdf.py   # check curation
+│       ├── 89_rebuild_combined_ischeck.py / 89a / 89b               # IsCheck rebuild
+│       ├── 12_split_combined_by_era.py #     Split master into 3 era files
+│       └── 08*_extraction_accuracy*.py #     Extraction-accuracy QC
+│
+├── analysis/                           # RGG modeling & diagnostics (scripts 12–86)
+│   ├── trait_rgg_config.R              #   shared secondary-trait RGG config
+│   └── data/                           #   canonical corpus + designation tables
+│       ├── nust_1941_2025_combined.csv #     master long file (3.77M rows) — DO NOT open in Excel
+│       ├── nust_1965_2025_combined.csv #     alias (same content)
+│       ├── nust_1941-1984_combined.csv #     era split 1
+│       ├── nust_1985-2004_combined.csv #     era split 2
+│       ├── nust_2005-2025_combined.csv #     era split 3
+│       ├── NUST_1941_2025_data_wide.csv      # wide modeling input
+│       └── nust_check_designation_years_1941_2025.csv + nust_checks_* + lookup
+│
+├── archive/                            # superseded / one-off / historical (history preserved)
+│   ├── scripts/                        #   88, tmp_*, early R 01–08, per-year fix/run instances
+│   ├── data/                           #   *.bak, pre_*_fix, intermediate subset CSVs
+│   ├── logs_docs/                      #   historical session logs + superseded docs
+│   └── reference_output/               #   (reserved)
+│
+├── reference/                          # static reference tables (locations, units, PlotInfo)
+├── diagnostics/                        # debug and inspection scripts
+├── input_files/  output_files/         # per-year source + extracted data
+└── docs/                               # current workflow documentation
+```
 
 ---
 
 ## Pipeline Architecture
 
 ```
-HISTORICAL PATH (pre-1989)              ANNUAL PATH (2020+)
+HISTORICAL PATH (pre-2020)              ANNUAL PATH (2024+)
 ────────────────────────────────        ────────────────────────────────
-STEP 1H — Python + Claude API:          STEP 1A — R extraction:
+STEP 1H — Python extraction:            STEP 1A — R extraction:
   extract_nust_xlsx.py                    NUST_StrainsTable_Processing.R
-    → long-format CSVs                    NUST_ChecksTable_Processing.R
-      (phenotypes, strains,               NUST_LocationsTable_Processing.R
-       parentage, descriptive,            NUST_Processing.R
-       disease, summary)
+    → *_phenotypes.csv (long)             NUST_ChecksTable_Processing.R
+    → *_strains.csv                       NUST_LocationsTable_Processing.R
+    → *_parentage.csv                     NUST_Processing.R
+    → *_descriptive.csv
+    → *_disease.csv
+    → *_summary.csv
           │
   validate_nust_hist.py
     → *_approved.csv
           │
-  qc_pdf_vs_csv.py (Claude API)
-    cell-by-cell validation
-    against source PDF
-    → patches applied via
-      year-specific fixes/
-          │
   NUST_HistProcessing.R (bridge)
-    → R intermediates
-      (wide format, ready for Step 2)
+    → phenotypesTable0.csv (wide)
+    → strainsTable1.csv
+    → parentageTable1.csv
+    → LocationsTable1.csv
+    → checksTable1.csv (0-row)
           │                                       │
           └─────────────────┬─────────────────────┘
                             ▼
@@ -51,79 +126,13 @@ STEP 1H — Python + Claude API:          STEP 1A — R extraction:
                 parentageTable1.csv
                 LocationsTable1.csv
                 checksTable1.csv
-                metaTable1.csv
-```
-
----
-
-## Repository Structure
-
-```
-NUST_Data_Prep/
-│
-├── run_nust_pipeline.R              # Entry point — annual data (2020+)
-├── run_nust_historical_pipeline.R   # Entry point — historical data (pre-1989)
-│
-├── Rscripts/                        # R processing modules
-│   ├── nust_utils.R                 #   Shared utility functions
-│   ├── nust_config.R                #   Year-aware config and test auto-detection
-│   ├── NUST_StrainsTable_Processing.R   #   Annual: strains + parentage table
-│   ├── NUST_ChecksTable_Processing.R    #   Annual: checks table
-│   ├── NUST_LocationsTable_Processing.R #   Annual: locations table
-│   ├── NUST_Processing.R                #   Annual: phenotype processing
-│   ├── NUST_HistProcessing.R            #   Historical: bridge — Python CSVs → R intermediates
-│   ├── NUST_CheckFinalFiles.R           #   SHARED Step 2: final QC + Files4Upload export
-│   └── DataChecksScript.R               #   Manual QC checks
-│
-├── scripts/                         # Core Python pipeline scripts
-│   ├── extract_nust_xlsx.py         #   Historical XLSX extraction via Claude API
-│   ├── validate_nust_hist.py        #   Post-extraction validation
-│   ├── combine_nust_outputs.py      #   Merge multi-file extractions + TEST_MAP
-│   ├── extract_test_map_pdf.py      #   Group→TestCode mapping from source PDF
-│   ├── extract_supplemental_pdf.py  #   Supplemental location data from PDF
-│   ├── build_location_ref.py        #   Build/geocode nust_locations_ref.csv
-│   ├── compute_maturity_doy.py      #   Convert maturity dates to DOY
-│   ├── apply_maturity_doy.py        #   Apply DOY values to phenotypes table
-│   ├── pdf_pipeline.py              #   PDF extraction utilities
-│   └── qc_pdf_vs_csv.py             #   QC: compare PDF values against CSV output
-│
-├── fixes/                           # Year-specific fix and patch scripts
-│   ├── fix_1980_locs.py             #   State norm, dedup, PlantingDate, lat/lon
-│   ├── fix_maturity_1980.py
-│   ├── fix_supplemental_1980.py
-│   ├── apply_patches_1980.py
-│   ├── compare_locations.py         #   Compare historical ref vs modern PlotInfo
-│   ├── patch_location_coords.py     #   Apply modern GPS to NeedsVerification rows
-│   └── clean_location_ref.py        #   One-time ref cleanup after initial geocoding
-│
-├── reference/                       # Reference tables (static + geocoded)
-│   ├── nust_locations_ref.csv       #   115 geocoded locations (1941–1986)
-│   ├── nust_locations_unique.csv    #   Unique City×State list from all years
-│   ├── 2024_NUST_Locations_PlotInfo.csv
-│   ├── 2025_NUST_Locations_PlotInfo.csv
-│   └── phenotypesTable1_units_ref.csv  # Phenotype → Units lookup
-│
-├── docs/                            # Supporting documentation
-│   ├── NUST_Phase2_Pipeline_Workflow.docx
-│   ├── system_prompt_multiyr_notes.md
-│   └── NUST_Processing_ReadMe.txt
-│
-├── logs/                            # Session notes, reports, open items
-│   ├── NUST_Pipeline_Session_*.md
-│   ├── NUST_1980_Open_Items.md
-│   └── NUST_Location_Comparison_*.md
-│
-├── diagnostics/                     # Archived debug and inspection scripts
-│
-├── input_1980/                      # Source XLSX + PDF for 1980
-└── output_1980/                     # Extracted CSVs for 1980
 ```
 
 ---
 
 ## Usage
 
-### Annual Data (2020+)
+### Annual Data (2024+)
 
 1. Edit `run_nust_pipeline.R` — set `YEAR` and `DATA_DIR`:
    ```r
@@ -138,7 +147,7 @@ NUST_Data_Prep/
 
 ---
 
-### Historical Data (pre-1989 XLSX)
+### Historical Data (pre-2020 XLSX)
 
 #### Step 1 — Extract from XLSX
 
@@ -161,11 +170,7 @@ python scripts/validate_nust_hist.py \
 
 Outputs `*_approved.csv` and `*_review_flagged.csv`. Review flagged rows before proceeding.
 
-#### Step 3 — QC and fix (year-specific)
-
-Run `scripts/qc_pdf_vs_csv.py` against the source PDF to identify cell-level discrepancies across all Test×Location combos. Apply year-specific fix scripts in `fixes/` to patch confirmed issues in the source tables, then re-validate. See `docs/NUST_Historical_Extraction_Workflow.md` for the full 3-phase QC workflow.
-
-#### Step 4 — Run R bridge + formatting
+#### Step 3 — Run R bridge + formatting
 
 Edit `run_nust_historical_pipeline.R` — set `YEAR`, `HIST_CSV_DIR`, and `DATA_DIR`:
 ```r
@@ -181,14 +186,7 @@ source("run_nust_historical_pipeline.R")
 
 Output written to `DATA_DIR/Files4Upload/`
 
-#### Step 5 — Verify cross-table consistency
-
-```bash
-python fixes/consistency_check_{year}.py   # strains, locations, checks, metaTable
-python fixes/verify_phase3_{year}.py       # confirm PDF-patched cells in Files4Upload
-```
-
-#### Step 6 — Map test labels (optional)
+#### Step 4 — Map test labels (optional)
 
 The extraction uses `Group_1`…`Group_6` as test identifiers. To remap to standard NUST codes (`UT00`, `UTI`, etc.), uncomment and fill in the `TEST_MAP` block at the bottom of `NUST_HistProcessing.R`:
 
@@ -211,7 +209,6 @@ TEST_MAP <- c(
 | `parentageTable1.csv` | Parentage: Female × Male cross |
 | `LocationsTable1.csv` | Location metadata: City, State, lat, lon, Conductor |
 | `checksTable1.csv` | Check entries and relative maturity |
-| `metaTable1.csv` | Per-location statistical metadata: CV%, LSD, row spacing, reps |
 
 ---
 
@@ -235,7 +232,7 @@ pip install openpyxl anthropic
 
 - R 4.4.2 (Windows)
 - Python 3.10 (Windows)
-- Tested on: annual 2024–2025 data; historical 1980 XLSX (fully QC'd against source PDF; all cross-table checks pass)
+- Tested on: annual 2024–2025 data; historical 1980 XLSX (`Sojabone-1980 (1-89 OR).xlsx`)
 
 ---
 
@@ -243,13 +240,11 @@ pip install openpyxl anthropic
 
 - The `ANTHROPIC_API_KEY` should be passed via `--api_key` argument or set as an environment variable. **Never commit API keys to this repository.**
 - Historical fatty acid / seed sugar traits (`PalmiticAcid`, `Oil`, etc.) are present as `NA` in pre-2023 output — these traits were not measured in early trials.
-- `LocationsTable1.csv` for historical years contains `NA` for `Conductor` and planting/maturity dates — not available in source documents. Coordinates (`lat`, `lon`) are populated from `reference/nust_locations_ref.csv` (115 geocoded locations, 1941–1986; 22 flagged `NeedsVerification`).
+- `LocationsTable1.csv` for historical years contains `NA` for `lat`, `lon`, `Conductor`, and planting/maturity dates — not available in source documents.
 
 ---
 
 ## Author Contributions
 
-**Primary author:** Vishnu Ramasubramanian(University of Minnesota)
-**PI:** Aaron Lorenz (University of Minnesota) & Rex Nelson (USDA)   
-**Contributors:** Lovepreet Singh (University of Minnesota) & Jacqueline Campbell (USDA)
+**Primary author:** Vishnu (University of Minnesota)
 **AI assistance:** Pipeline development and script implementation assisted by Claude (Anthropic, `claude-sonnet-4-6`) under author supervision.
