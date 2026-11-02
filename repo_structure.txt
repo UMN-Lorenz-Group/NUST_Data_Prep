@@ -1,0 +1,58 @@
+NUST_Data_Prep — data-prep-sync branch (scripts-only)
+======================================================
+This branch publishes the data-preparation WORKFLOW SCRIPTS only. The config /
+recovery CSVs and reference lookup tables the scripts consume, and all analysis
+scripts / results / corpus data, are kept local and are NOT part of this branch.
+
+157 files total = 155 pipeline scripts (139 .py + 16 .R) + README.md + this file.
+
+NUST_Data_Prep/
+│
+├── README.md
+├── repo_structure.txt                      # this file
+│
+└── data_prep/                              # staged extraction & data-prep pipeline
+    │
+    ├── stage0_extraction/          (9)     # source preprocess + raw PDF/XLSX extraction
+    │   ├── extract_nust_xlsx.py            #   historical XLSX extraction via Claude API
+    │   ├── extract_nust_pdf.py             #   PDF-direct extraction (years w/o XLSX)
+    │   ├── extract_nust_blocks.py          #   per-block XLSX extraction (1987/1988)
+    │   ├── extract_test_map_pdf.py         #   Group -> TestCode mapping from source PDF
+    │   ├── extract_combined_anchors.py     #   maturity reference-strain anchors
+    │   ├── extract_sojabone_anchors.py
+    │   ├── extract_urt_2017_2020_sheets.py
+    │   ├── pdf_pipeline.py                 #   unified cached-PDF query orchestrator
+    │   └── preprocess_pdf_compress.py      #   shrink PDFs below API size limit
+    │
+    ├── stage1_processing/         (34)     # per-year R bridge + QC + maturity DOY + locations
+    │   ├── run_nust_pipeline.R             #   entry point — annual data (2024+)
+    │   ├── run_nust_historical_pipeline.R  #   entry point — historical (pre-2023)
+    │   ├── nust_config.R  nust_utils.R     #   year-aware config + shared utilities
+    │   ├── NUST_Processing.R  NUST_HistProcessing.R
+    │   ├── NUST_*Table_Processing.R        #   Checks / Locations / Strains tables
+    │   ├── NUST_CheckFinalFiles.R  CheckFinalFiles.R  DataChecksScript.R
+    │   ├── validate_nust_hist.py  qc_pdf_vs_csv.py    #   post-extraction QC
+    │   ├── combine_nust_outputs.py         #   merge multi-file extractions + TEST_MAP
+    │   ├── compute_maturity_doy.py  apply_maturity_doy.py   #   maturity DOY conversion
+    │   ├── build_location_ref.py  build_location_canonical_map.py  clean_location_ref.py
+    │   └── (+ location/maturity gap-reporting & patch utilities)
+    │
+    └── stage2_corpus/            (112)      # cross-year corpus assembly, checks, QC gates
+        ├── 10_assemble_corpus.py           #   build the 1941–2025 long corpus
+        ├── 11_build_wide_1941_2025.py      #   pivot long -> wide (modeling schema)
+        ├── 12_split_combined_by_era.py     #   split master into 3 era files
+        ├── 13_qc_strain_germplasm_audit.py #   strain/germplasm stray gate
+        ├── 14_qc_duplicate_strains.py
+        ├── 15..19_*.py                     #   descriptive + disease extraction/compilation
+        ├── 65_build_check_lookup.py  67_build_checks_from_pdf.py    #   check curation
+        ├── 89_rebuild_combined_ischeck.py  89a / 89b                #   IsCheck rebuild
+        ├── 91..93_extract_anchor_checks_*.py                        #   anchor-check extraction
+        ├── apply_*.py                       #   recovery folds (maturity/oil/protein/ut_pt/subenv)
+        ├── build_*.py                       #   recovery/fix table builders
+        ├── audit_*.py  2x_verify_*.py       #   QC gates (DOY range, location std, strain codes)
+        ├── finalize_corpus_recoveries.py    #   orchestrator for the recovery steps
+        └── _archive_superseded_2026-07/     #   one superseded recovery script
+
+Pipeline flow:  stage0 (extract raw)  ->  stage1 (process + validate)  ->  stage2
+(assemble corpus + QC). Because the config/reference data is excluded, a clone of
+this branch is a code-review / reference publication, not a runnable checkout.

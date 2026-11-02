@@ -9,15 +9,57 @@
 # Word/Excel temporary lock files
 ~$*
 
-# Internal working documents (not for distribution)
-Formatting_Note_From_Rex.docx
-NUST_Phase2_Pipeline_Workflow.docx
+# Per-year input data (XLSX + PDF copied from R: drive on demand)
+input_*/
 
 # Extraction output directories (derived data, not source)
 output_*/
 
 # Annual processing data directories (raw trial data)
 2025_NUST_Processing/
+
+# Session-generated extraction / QC logs (regeneratable; curated NUST_*.md docs stay tracked)
+logs/extract_*.log
+logs/extract_*.err
+logs/dryrun_*.log
+logs/qc_*.log
+logs/qc_*.err
+logs/combine_*.log
+logs/validate_*.log
+logs/run_hist_*.log
+logs/apply_patches_*.log
+logs/verify_phase3_*.log
+logs/rerun_*.log
+logs/extract_test_map_*.log
+
+# PowerShell job scripts often have API keys inline — do not commit
+logs/*.ps1
+
+# Large combined-CSV outputs (>50 MB) — regeneratable from analysis/10_assemble_corpus.py
+analysis/data/_shared/nust_1965_2025_combined.csv
+analysis/data/_shared/nust_1941_1988_combined_f4u.csv
+analysis/data/_shared/nust_1993_2025_combined.csv
+analysis/data/_shared/nust_1941_2025_combined.csv
+analysis/data/_shared/nust_1941_2025_combined.csv.bak
+analysis/data/_shared/nust_1941_1988_combined_f4u.csv
+analysis/data/_shared/nust_1941_1990_combined_f4u.csv
+analysis/data/_shared/nust_1989_1992_combined.csv
+analysis/data/intermediate_output/nust_1980_1988_combined.csv
+analysis/data/intermediate_output/nust_1993_2025_combined.csv
+analysis/data/intermediate_output/nust_1941_1988_combined_f4u.csv
+
+# Era-split combined files (~310 MB) — regeneratable from data_prep/stage2_corpus/12_split_combined_by_era.py
+analysis/data/_shared/nust_1941-1984_combined.csv
+analysis/data/_shared/nust_1985-2004_combined.csv
+analysis/data/_shared/nust_2005-2025_combined.csv
+
+# Archived large data backups / intermediates (~1.5 GB) — historical, kept local only
+archive/data/
+
+# Large wide-format pivot (41 MB) — regeneratable from analysis/11_build_wide_1941_2025.py
+analysis/data/_shared/NUST_1941_2025_data_wide.csv
+# Pre-moisture-fix backup of wide pivot (41 MB) — kept locally, not in repo
+analysis/data/_shared/NUST_1941_2025_data_wide.pre_moisture_fix.csv
 
 # R binary data files
 *.RData
@@ -33,3 +75,78 @@ __pycache__/
 
 # Error JSON files from extraction runs (transient)
 error_*.json
+
+# Wide-file fix backups (large, regenerable)
+analysis/data/_shared/*.pre_*.bak
+
+# transient model re-run artifacts (maturity-fix)
+analysis/data/analysis_results/models/*.pre_matfix.bak
+analysis/data/_shared/nust_anchor_early_pdf.csv
+logs/model58_run_*.log
+logs/model58_envtrend_*.log
+logs/model92_run_*.log
+logs/model58_gammase_*.log
+logs/e7_expanded_*.log
+logs/mod_e7_*.log
+logs/e2v_exp_*.log
+logs/e7y_replot_*.log
+logs/e7y3_*.log
+logs/e7y4_*.log
+logs/e2v_exp2_*.log
+logs/e7y5_*.log
+logs/e7y6_*.log
+logs/consol_*.log
+logs/sc105*.log
+
+# session stragglers
+tmp_*.R
+analysis/data/analysis_results/models/modified_e7_*.csv
+analysis/data/analysis_results/trends/modified_e7_*.png
+logs/e7y_*.log
+
+# All backup / pre-fix snapshots (large, local only) — 2026-07 cleanup
+*.bak
+*.bak_*
+*.orig
+*.orig_*
+# Large intermediate/derived CSVs (regeneratable, local only) — 2026-07 cleanup
+analysis/data/_shared/_restored_combined.csv
+analysis/data/_shared/NUST_Combined_*.csv
+analysis/data/_shared/nust_2021_2025_combined.csv
+analysis/data/analysis_results/Corpus_QC/maturity_adjusted_yield_*.csv
+# Genotype data (large binary/VCF, local only)
+geno/*.vcf
+geno/*.gds
+geno/**/*.gds
+
+# Derived rotated-PDF intermediates (local only)
+data_prep/stage2_corpus/_oil_rotcorrected/
+
+# Large Krause reference PDFs (~6M each, local only)
+Pjt_Lit/Suppl.Info_Krause_2023.pdf
+Pjt_Lit/Krause_2023_NUST_GeneticGain.pdf
+Pjt_Lit/Krause_2025_Soybean_GxE_MegaEnvironments_dataPaper.pdf
+
+# Large local-only corpus intermediate (regenerable from the F4U sources)
+analysis/data/intermediate_output/nust_1965_1988_combined_f4u.csv
+
+# Maturity anchor-oracle PDF parse cache (regenerable from the report PDFs)
+analysis/data/intermediate_output/anchor_oracle_cache/
+
+# ── data-prep-sync branch: scripts-only remote (standing rule: no analysis/results/data) ──
+# This branch publishes ONLY data_prep/ workflow scripts. Everything below is kept off the remote.
+analysis/
+archive/
+geno/
+Pjt_Lit/
+reference/
+diagnostics/
+docs/
+logs/
+analysis_notes.*
+NUST_Phase2_Pipeline_Workflow.docx
+Formatting_Note_From_Rex.docx
+# data files inside the data-prep tree (config/recovery CSVs stay local)
+data_prep/**/*.csv
+data_prep/**/*.xlsx
+data_prep/**/*.md
